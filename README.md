@@ -14,13 +14,20 @@ composer require riskivy/yii2-rest-api-captcha
 Generate captcha code (image/png;base64):
 
 ```php
-(new CaptchaHelper())->generateImage();
+    public function actionCaptcha()
+    {
+        $captcha = new CaptchaHelper();
+        $captcha->maxLength = 4;
+        $captcha->minLength = 4;
+        $captcha->generateImage();
+    }
 ```
 
 Use in HTML:
 
 ```html
 <img src="<?= (new CaptchaHelper())->generateImage() ?>" />
+<img src="http://baseUrl/site/captcha" />
 ```
 Verify POST method captcha code:
 
