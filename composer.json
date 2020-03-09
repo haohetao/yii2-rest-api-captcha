@@ -1,12 +1,12 @@
 {
-    "name": "riskivy/yii2-rest-api-captcha",
+    "name": "haohetao/yii2-rest-api-captcha",
     "description": "The captcha image generator for restful api",
     "type": "library",
     "license": "GPL-2.0+",
     "authors": [
         {
-            "name": "Jack Hu",
-            "email": "jack.hu@tophant.com"
+            "name": "haohetao",
+            "email": "haohetao@gamil.com"
         }
     ],
     
@@ -19,7 +19,7 @@
     
     "autoload": {
         "psr-4": {
-            "riskivy\\captcha\\": ""
+            "haohetao\\captcha\\": ""
         }
     }
 }
