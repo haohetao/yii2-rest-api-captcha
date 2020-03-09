@@ -56,6 +56,7 @@ class CaptchaHelper extends CaptchaAction
             $response->content = "data:image/png;base64," . base64_encode($imageData);
         } else {
             $response->format = Response::FORMAT_RAW;
+            $response->headers->add('content-type', 'image/png');
             $response->content = $imageData;
         }
         Yii::$app->cache->set($this->generateSessionKey($this->generateCode()), $this->generateCode(), 60);
