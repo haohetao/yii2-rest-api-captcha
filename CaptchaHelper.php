@@ -69,17 +69,17 @@ class CaptchaHelper extends CaptchaAction
      */
     public static function isBase64()
     {
-        $mime = Yii::$app->request->acceptableContentTypes;
-        if (isset($mime['application/json']) ) {
+        $mime = Yii::$app->request->getContentType();
+        if (strncasecmp($mime, 'application/json', 16) === 0) {
             return true;
         }
-        if (isset($mime['text/json']) ) {
+        if (strncasecmp($mime, 'text/json', 9) === 0) {
             return true;
         }
-        if (isset($mime['application/javascript']) ) {
+        if (strncasecmp($mime, 'application/javascript', 22) === 0) {
             return true;
         }
-        if (isset($mime['text/javascript']) ) {
+        if (strncasecmp($mime, 'text/javascript', 15) === 0) {
             return true;
         }
         return false;
