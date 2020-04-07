@@ -42,6 +42,15 @@ class CaptchaHelper extends CaptchaAction
     {
         $this->init();
     }
+    
+    /**
+     * CaptchaHelper constructor.
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function __construct()
+    {
+        $this->init();
+    }
 
     /**
      * @return string
