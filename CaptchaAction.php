@@ -2,12 +2,11 @@
 
 namespace haohetao\captcha;
 
-use yii\captcha\CaptchaAction;
 use yii\base\Exception;
 use Yii;
 use yii\web\Response;
 
-class CaptchaHelper extends CaptchaAction
+class CaptchaAction extends \yii\captcha\CaptchaAction
 {
     /**
      * 显示数字验证码
@@ -35,41 +34,28 @@ class CaptchaHelper extends CaptchaAction
     private $code;
 
     /**
-     * CaptchaHelper constructor.
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function __construct()
-    {
-        $this->init();
-    }
-    
-    /**
-     * CaptchaHelper constructor.
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function __construct()
-    {
-        $this->init();
-    }
-
-    /**
      * @return string
      * @throws \yii\base\InvalidConfigException
      */
-    public function generateImage(): string
+    public function run()
     {
         $response = Yii::$app->getResponse();
-        $imageData = $this->renderImage($this->generateCode());
-        if (CaptchaHelper::isBase64()) {
+        $imageData = $this->renderImage($this->getVerifyCode());
+        if (CaptchaAction::isBase64()) {
             $response->format = Response::FORMAT_JSON;
-            $response->content = "data:image/png;base64," . base64_encode($imageData);
+            $content = "data:image/png;base64," . base64_encode($imageData);
         } else {
             $response->format = Response::FORMAT_RAW;
-            $response->headers->add('content-type', 'image/png');
-            $response->content = $imageData;
+            $response->getHeaders()
+                ->set('Pragma', 'public')
+                ->set('Expires', '0')
+                ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+                ->set('Content-Transfer-Encoding', 'binary')
+                ->set('Content-type', 'image/png');
+            $content = $imageData;
         }
-        Yii::$app->cache->set($this->generateSessionKey($this->generateCode()), $this->generateCode(), 60);
-        Yii::$app->end();
+        Yii::$app->cache->set($this->generateSessionKey($this->getVerifyCode()), $this->getVerifyCode(), 60);
+        return $content;
     }
 
     /**
@@ -95,14 +81,15 @@ class CaptchaHelper extends CaptchaAction
     }
 
     /**
-     * @return string
+     * Gets the verification code.
+     * @param bool $regenerate 在Rest中这一项不生效
+     * @return string the verification code.
      */
-    public function generateCode(): string
+    public function getVerifyCode($regenerate = true): string
     {
         if ($this->code) {
             return $this->code;
         }
-
         return $this->code = $this->generateVerifyCode();
     }
 
@@ -129,8 +116,6 @@ class CaptchaHelper extends CaptchaAction
                 $code .= $this->digits[mt_rand(0, $digitsCount)];
             }
         } else {
-            $this->letters = 'bcdfghjklmnpqrstvwxyz';
-            $this->vowels = 'aeiou';
             $code = '';
             for ($i = 0; $i < $length; ++$i) {
                 if ($i % 2 && mt_rand(0, 10) > 2 || !($i % 2) && mt_rand(0, 10) > 9) {
@@ -145,12 +130,18 @@ class CaptchaHelper extends CaptchaAction
     }
 
     /**
-     * @param string $code
-     * @return bool
-     * @throws Exception
+     * Validates the input to see if it matches the generated code.
+     * @param string $input user input
+     * @param bool $caseSensitive 在Rest中这一项没有意义，验证码只有小写
+     * @return bool whether the input is valid
      */
-    public function verify(string $code): bool
+    public function validate($input, $caseSensitive = false): bool
     {
+        if ($caseSensitive) {
+            $code = strtolower ($input);
+        } else {
+            $code = $input;
+        }
         $verify = Yii::$app->cache->get($this->generateSessionKey($code));
 
         // 删除cache

@@ -14,23 +14,30 @@ composer require haohetao/yii2-rest-api-captcha
 Generate captcha code (image/png;base64):
 
 ```php
-    public function actionCaptcha()
+    public function actions()
     {
-        $captcha = new CaptchaHelper();
-        $captcha->maxLength = 4;
-        $captcha->minLength = 4;
-        $captcha->generateImage();
+        return [
+            'captcha' => [
+                'class' => 'haohetao\captcha\CaptchaAction',
+                'maxLength' => 4,
+                'minLength' => 4
+            ]
+        ];
     }
 ```
-
-Use in HTML:
-
-```html
-<img src="<?= (new CaptchaHelper())->generateImage() ?>" />
-<img src="http://baseUrl/site/captcha" />
+use in curl(for test):
+```shell
+curl http://localhost/site/captcha
 ```
-Verify POST method captcha code:
+Verify captcha code:
 
 ```php
-(new CaptchaHelper())->verify(\Yii::$app->request->post('code'));
+    public function rules()
+    {
+        return [
+            [
+                'code', \haohetao\captcha\CaptchaValidator::class
+            ]
+        ];
+    }
 ```
