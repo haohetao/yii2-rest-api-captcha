@@ -54,7 +54,7 @@ class CaptchaAction extends \yii\captcha\CaptchaAction
                 ->set('Content-type', 'image/png');
             $content = $imageData;
         }
-        Yii::$app->cache->set($this->generateSessionKey($this->getVerifyCode()), $this->getVerifyCode(), 60);
+        Yii::$app->cache->set($this->generateSessionKey($this->getVerifyCode()), $this->getVerifyCode(), 600);
         return $content;
     }
 
@@ -64,17 +64,17 @@ class CaptchaAction extends \yii\captcha\CaptchaAction
      */
     public static function isBase64()
     {
-        $mime = Yii::$app->request->getContentType();
-        if (strncasecmp($mime, 'application/json', 16) === 0) {
+        $mime = Yii::$app->request->getAcceptableContentTypes();
+        if (isset($mime['application/json'])) {
             return true;
         }
-        if (strncasecmp($mime, 'text/json', 9) === 0) {
+        if (isset($mime['text/json'])) {
             return true;
         }
-        if (strncasecmp($mime, 'application/javascript', 22) === 0) {
+        if (isset($mime['application/javascript'])) {
             return true;
         }
-        if (strncasecmp($mime, 'text/javascript', 15) === 0) {
+        if (isset($mime['text/javascript'])) {
             return true;
         }
         return false;
@@ -90,6 +90,7 @@ class CaptchaAction extends \yii\captcha\CaptchaAction
         if ($this->code) {
             return $this->code;
         }
+
         return $this->code = $this->generateVerifyCode();
     }
 
