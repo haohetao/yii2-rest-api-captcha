@@ -37,8 +37,10 @@ class CaptchaAction extends \yii\captcha\CaptchaAction
      * @return string
      * @throws \yii\base\InvalidConfigException
      */
-    public function run()
+    public function run($foreColor = '0x2040A0', $backColor = '0xFFFFFF')
     {
+        $this->foreColor = hexdec($foreColor);
+        $this->backColor = hexdec($backColor);
         $response = Yii::$app->getResponse();
         $imageData = $this->renderImage($this->getVerifyCode());
         if (CaptchaAction::isBase64()) {
